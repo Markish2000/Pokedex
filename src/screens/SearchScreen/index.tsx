@@ -1,20 +1,38 @@
+import {useEffect, useState} from 'react';
+
 import {Platform, View, Text, FlatList, Dimensions} from 'react-native';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-import {usePokemonSearch} from '../../hooks/usePokemonSearch';
-
 import {SearchInput} from '../../components/SearchInput';
 import {PokemonCard} from '../../components/PokemonCard';
 import {Loading} from '../../components/Loading';
+
+import {usePokemonSearch} from '../../hooks/usePokemonSearch';
+
+import {SimplePokemon} from '../../interfaces/pokemonInterfaces';
 
 import {styles} from '../../themes';
 
 const screenWidth = Dimensions.get('window').width;
 
 export const SearchScreen = () => {
-  const {top} = useSafeAreaInsets();
+  const [pokemonFiltered, setPokemonFiltered] = useState<SimplePokemon[]>([]);
+  const [term, setTerm] = useState('');
+
   const {isFetching, simplePokemonList} = usePokemonSearch();
+
+  const {top} = useSafeAreaInsets();
+
+  useEffect(() => {
+    if (term.length === 0) return setPokemonFiltered([]);
+
+    setPokemonFiltered(
+      simplePokemonList.filter(poke =>
+        poke.name.toLowerCase().includes(term.toLowerCase()),
+      ),
+    );
+  }, [term]);
 
   if (isFetching) return <Loading />;
 
@@ -25,6 +43,7 @@ export const SearchScreen = () => {
         marginHorizontal: 20,
       }}>
       <SearchInput
+        onDebounce={value => setTerm(value)}
         style={{
           position: 'absolute',
           zIndex: 999,
@@ -33,7 +52,7 @@ export const SearchScreen = () => {
         }}
       />
       <FlatList
-        data={simplePokemonList}
+        data={pokemonFiltered}
         showsVerticalScrollIndicator={false}
         numColumns={2}
         ListHeaderComponent={
@@ -45,7 +64,7 @@ export const SearchScreen = () => {
               paddingBottom: 10,
               marginTop: Platform.OS === 'ios' ? top + 60 : top + 80,
             }}>
-            Pokedex
+            {term}
           </Text>
         }
         keyExtractor={pokemon => pokemon.id}
