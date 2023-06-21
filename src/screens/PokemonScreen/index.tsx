@@ -13,7 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import {FadeInImage} from '../../components/FadeInImage';
 
-import {RootStackParams} from '../../Navigator';
+import {RootStackParams} from '../../Navigator/Tab1';
 import {usePokemon} from '../../hooks/usePokemon';
 import {PokemonDetails} from '../../components/PokemonDetails';
 
